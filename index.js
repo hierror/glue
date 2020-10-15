@@ -1,4 +1,7 @@
-require('dotenv').config();
-const server = require('./src/server.js');
+import dotenv from 'dotenv';
+import start from './src/server.js';
 
-server.start(process.env.PORT);
+dotenv.config();
+process.env['CONTA_CORRENTE'] = 2144346825; // To REMOVE
+
+start(process.env.PORT);

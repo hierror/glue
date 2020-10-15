@@ -1,8 +1,8 @@
-const Router = require('koa-router');
-const { test } = require('../controllers/hotmart/hotmart.controller');
+import Router from 'koa-router';
+import { purchaseCompleted } from '../controllers/hotmart/hotmart.controller.js';
 
 const router = new Router();
 
-router.get('/', test);
+router.post('/purchase/completed', purchaseCompleted);
 
-module.exports = router;
+export default router;

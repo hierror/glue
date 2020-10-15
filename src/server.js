@@ -1,11 +1,11 @@
-const Koa = require('koa');
-const err = require('./helpers/error');
-const cors = require('@koa/cors');
-const bodyParser = require('koa-body');
-const logger = require('koa-logger');
+import Koa from 'koa';
+import err from './helpers/error.js';
+import cors from '@koa/cors';
+import bodyParser from 'koa-body';
+import logger from 'koa-logger';
 
 const app = new Koa();
-const router = require('./routes');
+import router from './routes.js';
 
 app.use(err);
 app.use(cors());
@@ -18,7 +18,7 @@ app.on('error', (err, ctx) => {
     console.error(err);
 });
 
-exports.start = (port) => {
+export default (port) => {
     console.log(`Starting the server on port ${port}...`);
     app.listen(port);
 };

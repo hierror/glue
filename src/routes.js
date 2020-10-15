@@ -1,5 +1,6 @@
-const Router = require('koa-router');
-const hotmartRouter = require('./routes/hotmart.router');
+import Router from 'koa-router';
+import HotmartRouter from './routes/hotmart.router.js';
+import { HotmartAuth } from './helpers/auth.js'
 
 const router = new Router({
     prefix: '/api'
@@ -8,7 +9,7 @@ const router = new Router({
 /*
     REQUESTS base_url/api/hotmart
 */
-router.use('/hotmart', hotmartRouter.routes());
+router.use('/hotmart', HotmartAuth, HotmartRouter.routes());
 
 /*
     GET base_url/api
@@ -17,4 +18,4 @@ router.get('/', async (ctx, next) => {
     console.log('Testing...');
 });
 
-module.exports = router;
+export default router;
