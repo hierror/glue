@@ -1,3 +1,4 @@
 .env
 node_modules/
 glue.zip
+update_and_run.sh
