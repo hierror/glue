@@ -1,7 +1,7 @@
 import * as OmieService from '../../services/omie/omie.service.js';
 import { HotmartClient } from '../../resources/client/client.resource.js';
 
-export const purchaseCompleted = async (ctx, next) => {
+export const purchaseApproved = async (ctx, next) => {
     const data = ctx.request.body;
     const client = new HotmartClient(data.receiver_type, data);
 
@@ -40,7 +40,12 @@ export const purchaseCompleted = async (ctx, next) => {
     const purchase = new HotmartPurchase(data.receiver_type, data, client.code);
 
     try {
-        const purchase = await OmieService.registerNewPurchase();
+        let accounts = await OmieService.getCheckingAccounts();
+        let regex = /Hotmart/;
+
+        accounts = accounts.filter((curr) => regex.test(curr['descricao']));
+
+        const purchase = await OmieService.registerNewPurchase(purchase, accounts[0]);
     } catch (e) {
         ctx.throw(500, e.message);
     }
@@ -50,5 +55,19 @@ export const purchaseCompleted = async (ctx, next) => {
         status: 'success',
         message: 'New Hotmart Purchase registered',
         payload: { ...purchase }
+    };
+};
+
+export const purchaseCompleted = async (ctx, next) => {
+    const data = ctx.request.body;
+    const purchaseCode = data.transaction;
+
+    await OmieService.confirmPurchasePayment(purchaseCode);
+
+    ctx.status = 204;
+    ctx.body = {
+        status: 'success',
+        message: 'Hotmart Purchase payment confirmed',
+        payload: null
     };
 };

@@ -27,6 +27,33 @@ async function callOmieAPI ({ method, endpoint, call, parameters }) {
     return response.json();
 }
 
+export async function getCheckingAccounts() {
+    let data;
+    const call = 'ListarContasCorrentes';
+    const endpoint = '/geral/contacorrente/';
+
+    const param = {
+        'pagina': 1,
+        'registros_por_pagina': 50,
+        'apenas_importado_api': 'N'
+    }
+    
+    const options = {
+        method: 'POST',
+        endpoint,
+        call,
+        param
+    };
+
+    try {
+        data = await callOmieAPI(options);
+    } catch (e) {
+        throw new Error('Error on listing checking accounts');
+    }
+
+    return data['ListarContasCorrentes'];
+};
+
 /**
  * Checking if the client already exists
 */
@@ -118,7 +145,7 @@ export async function registerClient(client, tags) {
 /**
  * 
  */
-export async function registerNewPurchase(purchase) {
+export async function registerNewPurchase(purchase, checkingAccount) {
     let data;
     const call = 'IncluirContaReceber';
     const endpoint = '/financas/contareceber/';
@@ -127,9 +154,10 @@ export async function registerNewPurchase(purchase) {
         "codigo_lancamento_integracao": purchase.purchaseCode,
         "codigo_cliente_fornecedor": purchase.clientCode,
         "data_vencimento": purchase.getReceivingDate(),
+        "valor_documento": purchase.value,
         "codigo_categoria": "1.01.02", // Infoproduto
         "data_previsao": purchase.getReceivingDate(),
-        "id_conta_corrente":  process.env.CONTA_CORRENTE // Desenvolver método que buscar por conta corrente 
+        "id_conta_corrente": checkingAccount || process.env.CHECKING_ACCOUNT // Desenvolver método que buscar por conta corrente 
     };
     
     try {
@@ -138,5 +166,43 @@ export async function registerNewPurchase(purchase) {
         throw new Error('Error on purchase registration');
     }
 
-    return data['codigo_cliente_omie'];
+    return data;
+};
+
+/*
+export async function cancelPurchasePayment(purchaseCode) {
+    let data;
+    const call = 'CancelarRecebimento';
+    const endpoint = '/financas/contareceber/';
+
+    let param = {
+        "codigo_baixa_integracao": purchaseCode,
+    };
+    
+    try {
+        data = await callOmieAPI('POST', endpoint, call, param);
+    } catch (e) {
+        throw new Error('Error on purchase\'s payment canceletion');
+    }
+
+    return data;
+};
+*/
+
+export async function confirmPurchasePayment(purchaseCode) {
+    let data;
+    const call = 'LancarRecebimento';
+    const endpoint = '/financas/contareceber/';
+
+    let param = {
+        "codigo_lancamento_integracao": purchaseCode,
+    };
+    
+    try {
+        data = await callOmieAPI('POST', endpoint, call, param);
+    } catch (e) {
+        throw new Error('Error on purchase\'s payment confirmation');
+    }
+
+    return data;
 };
