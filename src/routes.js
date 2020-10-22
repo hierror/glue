@@ -16,6 +16,13 @@ router.use('/hotmart', HotmartAuth, HotmartRouter.routes());
 */
 router.get('/', async (ctx, next) => {
     console.log('Testing...');
+
+    ctx.status = 200;
+    ctx.body = {
+        status: 'success',
+        message: 'Testing the API',
+        payload: null
+    };
 });
 
 export default router;
