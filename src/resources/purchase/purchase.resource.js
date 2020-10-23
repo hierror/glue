@@ -19,6 +19,6 @@ export class HotmartPurchase {
     }
 
     getReceivingDate() {
-        return this.receivingDate.toISOString();
+        return this.receivingDate.toLocaleDateString('pt-BR');
     }
 }

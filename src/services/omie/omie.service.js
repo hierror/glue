@@ -4,12 +4,18 @@ import fetch from 'node-fetch';
  * Every OMIE API call needs to have the credentials, the specified call and the parameters
  */
 
-async function callOmieAPI ({ method, endpoint, call, parameters }) {
+async function callOmieAPI ({ method, endpoint, call, param }) {
     const url = process.env.OMIE_API_BASE_URL + endpoint;
     const credentials = {
         app_key: process.env.OMIE_API_KEY,
         app_secret:process.env.OMIE_API_SECRET
     }
+
+    const body = JSON.stringify({
+        call: call,
+        ...credentials,
+        param: [ param ]
+    });
 
     const response = await fetch(url, {
         method: method,
@@ -17,11 +23,7 @@ async function callOmieAPI ({ method, endpoint, call, parameters }) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            call: call,
-            ...credentials,
-            param: [ parameters ]
-        })
+        body
     });
 
     return response.json();
@@ -37,16 +39,14 @@ export async function getCheckingAccounts() {
         'registros_por_pagina': 50,
         'apenas_importado_api': 'N'
     }
-    
-    const options = {
-        method: 'POST',
-        endpoint,
-        call,
-        param
-    };
 
     try {
-        data = await callOmieAPI(options);
+        data = await callOmieAPI({
+            method: 'POST',
+            endpoint,
+            call,
+            param
+        });
     } catch (e) {
         throw new Error('Error on listing checking accounts');
     }
@@ -78,23 +78,26 @@ export async function isClientRegistered({ docs, email, name }) {
         'apenas_importado_api': 'N',
         'clientesFiltro': filter
     }
-    
-    const options = {
-        method: 'POST',
-        endpoint,
-        call,
-        param
-    };
 
     try {
-        data = await callOmieAPI(options);
+        data = await callOmieAPI({
+            method: 'POST',
+            endpoint,
+            call,
+            param
+        });
     } catch (e) {
         throw new Error('Error on checking if user is registered');
     }
 
     const info = {
-        registered: (data['registros'] === 1),
-        clientCode: data['clientes_cadastro_resumido'][0]['codigo_cliente']
+        registered: false,
+        clientCode: null
+    }
+
+    if (data.hasOwnProperty('registros')) {
+        info.registered = true;
+        info.clientCode = data['clientes_cadastro_resumido'][0]['codigo_cliente']
     }
 
     return info;
@@ -110,10 +113,13 @@ export async function registerClient(client, tags) {
 
     let param = {};
 
+    param['codigo_cliente_integracao'] = client.email;
     param['razao_social'] = client.name;
     param['nome_fantasia'] = client.name;
     param['contato'] = client.name;
     param['tags'] = tags;
+
+    console.log(tags);
 
     if (client.type === 'SELLER') {
         param['email'] = client.email;
@@ -130,10 +136,17 @@ export async function registerClient(client, tags) {
     }
      
     try {
-        data = await callOmieAPI('POST', endpoint, call, param);
+        data = await callOmieAPI({
+            method: 'POST',
+            endpoint,
+            call,
+            param
+        });
     } catch (e) {
         throw new Error('Error on user registration');
     }
+
+    console.log(data);
 
     if (data['codigo_status'] !== '0')
         throw new Error('Error on user registration');
@@ -159,9 +172,14 @@ export async function registerNewPurchase(purchase, checkingAccount) {
         "data_previsao": purchase.getReceivingDate(),
         "id_conta_corrente": checkingAccount || process.env.CHECKING_ACCOUNT // Desenvolver método que buscar por conta corrente 
     };
-    
+
     try {
-        data = await callOmieAPI('POST', endpoint, call, param);
+        data = await callOmieAPI({
+            method: 'POST',
+            endpoint,
+            call,
+            param
+        });
     } catch (e) {
         throw new Error('Error on purchase registration');
     }
@@ -199,7 +217,12 @@ export async function confirmPurchasePayment(purchaseCode) {
     };
     
     try {
-        data = await callOmieAPI('POST', endpoint, call, param);
+        data = await callOmieAPI({
+            method: 'POST',
+            endpoint,
+            call,
+            param
+        });
     } catch (e) {
         throw new Error('Error on purchase\'s payment confirmation');
     }

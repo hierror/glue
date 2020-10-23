@@ -1,5 +1,6 @@
 import * as OmieService from '../../services/omie/omie.service.js';
 import { HotmartClient } from '../../resources/client/client.resource.js';
+import { HotmartPurchase } from '../../resources/purchase/purchase.resource.js';
 
 export const purchaseApproved = async (ctx, next) => {
     const data = ctx.request.body;
@@ -21,12 +22,12 @@ export const purchaseApproved = async (ctx, next) => {
 
     if (!info.registered) {
         try {
-            const tags = ['Hotmart'];
+            const tags = [ { 'tag': 'Hotmart' }];
 
             if (client.type === 'SELLER') {
-                tags.push('Produtor');
+                tags.push({ 'tag': 'Cliente' });
             } else {
-                tags.push('Cliente');
+                tags.push({ 'tag': 'Produtor' });
             }
 
             info.clientCode = await OmieService.registerClient(client, tags);
@@ -37,6 +38,7 @@ export const purchaseApproved = async (ctx, next) => {
 
     client.setCode(info.clientCode);
 
+    let purchaseData;
     const purchase = new HotmartPurchase(data.receiver_type, data, client.code);
 
     try {
@@ -45,7 +47,7 @@ export const purchaseApproved = async (ctx, next) => {
 
         accounts = accounts.filter((curr) => regex.test(curr['descricao']));
 
-        const purchase = await OmieService.registerNewPurchase(purchase, accounts[0]);
+        purchaseData = await OmieService.registerNewPurchase(purchase, accounts[0]);
     } catch (e) {
         ctx.throw(500, e.message);
     }
@@ -54,7 +56,7 @@ export const purchaseApproved = async (ctx, next) => {
     ctx.body = {
         status: 'success',
         message: 'New Hotmart Purchase registered',
-        payload: { ...purchase }
+        payload: { ...purchaseData }
     };
 };
 
