@@ -229,3 +229,26 @@ export async function confirmPurchasePayment(purchaseCode) {
 
     return data;
 };
+
+export async function purchaseExists(purchaseCode) {
+    let data;
+    const call = 'ConsultarContaReceber';
+    const endpoint = '/financas/contareceber/';
+
+    let param = {
+        "codigo_lancamento_integracao": purchaseCode,
+    };
+    
+    try {
+        data = await callOmieAPI({
+            method: 'POST',
+            endpoint,
+            call,
+            param
+        });
+    } catch (e) {
+        throw new Error('Error on purchase\'s payment consult');
+    }
+
+    return data.includes("codigo_lancamento_integracao");
+};

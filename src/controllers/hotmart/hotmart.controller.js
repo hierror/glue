@@ -70,6 +70,17 @@ export const purchaseCompleted = async (ctx, next) => {
     console.log(`(Purchase completed)
     Transaction ID: ${ctx.data.transaction}\n\n`);
 
+    const exists = await OmieService.purchaseExists(purchaseCode);
+
+    if (!exists) {
+        ctx.status = 500;
+        ctx.body = {
+            status: 'error',
+            message: 'Hotmart Purchase isn\'t registered',
+            payload: null
+        };    
+    }
+
     const data = ctx.request.body;
     const purchaseCode = data.transaction;
 
