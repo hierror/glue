@@ -123,7 +123,7 @@ export async function registerClient(client, tags) {
 
     if (client.type === 'SELLER') {
         param['email'] = client.email;
-        param['cpnj_cpf'] = client.docs;
+        param['cnpj_cpf'] = client.docs;
         param['telefone1_ddd'] = client.phoneCode;
         param['telefone1_numero'] = client.phone;
         param['endereco'] = client.adress;
