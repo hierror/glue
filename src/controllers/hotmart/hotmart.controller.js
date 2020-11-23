@@ -3,10 +3,11 @@ import { HotmartClient } from '../../resources/client/client.resource.js';
 import { HotmartPurchase } from '../../resources/purchase/purchase.resource.js';
 
 export const purchaseApproved = async (ctx, next) => {
-    console.log(`(New purchase)
-    Transaction ID: ${ctx.data.transaction}\n\n`);
-
     const data = ctx.request.body;
+
+    console.log(`(New purchase)
+    Transaction ID: ${data.transaction}\n\n`);
+
     const client = new HotmartClient(data.receiver_type, data);
 
     let info;
@@ -25,7 +26,7 @@ export const purchaseApproved = async (ctx, next) => {
 
     if (!info.registered) {
         console.log(`(New client)
-        Client DOCS: ${ctx.data.docs}\n\n`);
+        Client DOCS: ${data.docs}\n\n`);
 
         try {
             const tags = [ { 'tag': 'Hotmart' }];
@@ -68,7 +69,7 @@ export const purchaseApproved = async (ctx, next) => {
 
 export const purchaseCompleted = async (ctx, next) => {
     console.log(`(Purchase completed)
-    Transaction ID: ${ctx.data.transaction}\n\n`);
+    Transaction ID: ${ctx.request.body.transaction}\n\n`);
 
     const exists = await OmieService.purchaseExists(purchaseCode);
 
