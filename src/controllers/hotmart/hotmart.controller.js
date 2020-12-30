@@ -1,6 +1,8 @@
 import * as OmieService from '../../services/omie/omie.service.js';
 import { HotmartClient } from '../../resources/client/client.resource.js';
 import { HotmartPurchase } from '../../resources/purchase/purchase.resource.js';
+import Client from '../../resources/client/client.model.js';
+import Purchase from '../../resources/purchase/purchase.model.js';
 
 export const purchaseApproved = async (ctx, next) => {
     const data = ctx.request.body;
@@ -29,6 +31,21 @@ export const purchaseApproved = async (ctx, next) => {
         Client DOCS: ${data.docs}\n\n`);
 
         try {
+            // Criação do registro do cliente no banco de dados
+            let { name, docs, email } = client;
+
+            console.log(`(Registering new client in database)
+            Client: ${name}, ${docs}, ${email}\n\n`);
+
+            await Client.create({
+                name,
+                docs,
+                email
+            });
+
+            // Criação do registro do cliente na Omie
+            console.log(`(Registering new client at Omie)\n\n`);
+            
             const tags = [ { 'tag': 'Hotmart' }];
 
             if (client.type === 'SELLER') {
@@ -49,8 +66,22 @@ export const purchaseApproved = async (ctx, next) => {
     const purchase = new HotmartPurchase(data.receiver_type, data, client.code);
 
     try {
+        // Criação do registro da compra no banco de dados
+        let { purchaseCode, clientCode } = purchase;
+
+        console.log(`(Registering new purchase in database)
+        Purchase: ${purchaseCode}\n\n`);
+
+        await Purchase.create({
+            purchaseCode,
+            clientCode
+        });
+
+        // Criação do registro da compra na Omie
+        console.log(`(Registering new purchase at Omie)\n\n`);
+
         let accounts = await OmieService.getCheckingAccounts();
-        let regex = /Hotmart/;
+        let regex = /hotmart/i;
 
         accounts = accounts.filter((curr) => regex.test(curr['descricao']));
 

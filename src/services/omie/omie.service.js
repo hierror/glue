@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import Purchase from '../../resources/purchase/purchase.model.js';
 
 /**
  * Every OMIE API call needs to have the credentials, the specified call and the parameters
@@ -162,9 +163,10 @@ export async function registerNewPurchase(purchase, checkingAccount) {
     let data;
     const call = 'IncluirContaReceber';
     const endpoint = '/financas/contareceber/';
+    const purchaseDB = await Purchase.findOne({ purchaseCode: purchase.purchaseCode }).exec();
 
     let param = {
-        "codigo_lancamento_integracao": purchase.purchaseCode,
+        "codigo_lancamento_integracao": purchaseDB._id,
         "codigo_cliente_fornecedor": purchase.clientCode,
         "data_vencimento": purchase.getReceivingDate(),
         "valor_documento": purchase.value,
@@ -234,12 +236,19 @@ export async function purchaseExists(purchaseCode) {
     let data;
     const call = 'ConsultarContaReceber';
     const endpoint = '/financas/contareceber/';
+    const purchaseDB = await Purchase.findOne({ purchaseCode: purchase.purchaseCode }).exec();
 
     let param = {
-        "codigo_lancamento_integracao": purchaseCode,
+        "codigo_lancamento_integracao": purchaseDB.purchaseCode,
     };
     
     try {
+        // Criação do registro de compra completa no banco de dados
+        await Purchase.updateOne({ _id: purchaseDB.purchaseCode}, { 
+            $set: { completedAt: Date.now() }
+        });
+
+        // Criação do registro de compra completa na Omie
         data = await callOmieAPI({
             method: 'POST',
             endpoint,
