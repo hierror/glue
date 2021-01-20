@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import Purchase from '../../resources/purchase/purchase.model.js';
+import Client from '../../resources/client/client.model.js';
 
 /**
  * Every OMIE API call needs to have the credentials, the specified call and the parameters
