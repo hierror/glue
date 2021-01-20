@@ -2,3 +2,4 @@
 node_modules/
 glue.zip
 update-and-run.sh
+container/

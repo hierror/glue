@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    container_name: glue-app
+    restart: always
+    build: .
+    ports:
+      - '80:80'
+    external_links:
+      - mongo
+  db:
+    container_name: glue-db
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./container/data:/data/db
