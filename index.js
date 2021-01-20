@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import start from './src/server.js';
 
 dotenv.config();
-process.env.CHECKING_ACCOUNT = 2144346825; // To REMOVE
+process.env.CHECKING_ACCOUNT = 1283128167; // To REMOVE
 
 mongoose
   .connect(

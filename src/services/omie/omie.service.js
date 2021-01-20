@@ -111,10 +111,15 @@ export async function registerClient(client, tags) {
     let data;
     const call = 'IncluirCliente';
     const endpoint = '/geral/clientes/';
+    const clientDB = await Client.findOne({ $or: [
+        {'docs': client.docs},
+        {'email': client.email}, 
+        {'name': client.name}
+    ]}).exec();
 
     let param = {};
 
-    param['codigo_cliente_integracao'] = client.email;
+    param['codigo_cliente_integracao'] = clientDB._id;
     param['razao_social'] = client.name;
     param['nome_fantasia'] = client.name;
     param['contato'] = client.name;
@@ -146,8 +151,6 @@ export async function registerClient(client, tags) {
     } catch (e) {
         throw new Error('Error on user registration');
     }
-
-    console.log(data);
 
     if (data['codigo_status'] !== '0')
         throw new Error('Error on user registration');
