@@ -85,7 +85,7 @@ export const purchaseApproved = async (ctx, next) => {
 
         accounts = accounts.filter((curr) => regex.test(curr['descricao']));
 
-        purchaseData = await OmieService.registerNewPurchase(purchase, accounts[0]);
+        purchaseData = await OmieService.registerNewPurchase(purchase, accounts[0]["nCodCC"]);
     } catch (e) {
         ctx.throw(500, e.message);
     }
