@@ -216,16 +216,22 @@ export async function cancelPurchasePayment(purchaseCode) {
 };
 */
 
-export async function confirmPurchasePayment(purchaseCode) {
+export async function confirmPurchasePayment(transactionId) {
     let data;
     const call = 'LancarRecebimento';
     const endpoint = '/financas/contareceber/';
+    const purchaseDB = await Purchase.findOne({ purchaseCode: transactionId }).exec();
 
     let param = {
-        "codigo_lancamento_integracao": purchaseCode,
+        "codigo_lancamento_integracao": purchaseDB._id,
     };
-    
+
     try {
+        // Criação do registro de compra completa no banco de dados
+        await Purchase.updateOne({ _id: purchaseDB._id}, { 
+            $set: { completedAt: Date.now() }
+        });
+
         data = await callOmieAPI({
             method: 'POST',
             endpoint,
@@ -245,17 +251,16 @@ export async function purchaseExists(transactionId) {
     const endpoint = '/financas/contareceber/';
     const purchaseDB = await Purchase.findOne({ purchaseCode: transactionId }).exec();
 
+    if (purchaseDB === null) {
+        return false;
+    }
+
     let param = {
-        "codigo_lancamento_integracao": purchaseDB.purchaseCode,
+        "codigo_lancamento_integracao": purchaseDB._id,
     };
     
     try {
-        // Criação do registro de compra completa no banco de dados
-        await Purchase.updateOne({ _id: purchaseDB.purchaseCode}, { 
-            $set: { completedAt: Date.now() }
-        });
-
-        // Criação do registro de compra completa na Omie
+        // Consulta da existência de compra
         data = await callOmieAPI({
             method: 'POST',
             endpoint,
