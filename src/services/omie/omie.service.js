@@ -144,7 +144,7 @@ export async function registerClient(client, tags) {
     if (!(client.docs === "NÃO-INFORMADO")) {
         param['cnpj_cpf'] = client.docs;
     }
-    
+
     try {
         data = await callOmieAPI({
             method: 'POST',
@@ -239,11 +239,11 @@ export async function confirmPurchasePayment(purchaseCode) {
     return data;
 };
 
-export async function purchaseExists(purchaseCode) {
+export async function purchaseExists(transactionId) {
     let data;
     const call = 'ConsultarContaReceber';
     const endpoint = '/financas/contareceber/';
-    const purchaseDB = await Purchase.findOne({ purchaseCode: purchase.purchaseCode }).exec();
+    const purchaseDB = await Purchase.findOne({ purchaseCode: transactionId }).exec();
 
     let param = {
         "codigo_lancamento_integracao": purchaseDB.purchaseCode,

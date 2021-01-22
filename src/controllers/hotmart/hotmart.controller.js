@@ -99,10 +99,12 @@ export const purchaseApproved = async (ctx, next) => {
 };
 
 export const purchaseCompleted = async (ctx, next) => {
-    console.log(`(Purchase completed)
-    Transaction ID: ${ctx.request.body.transaction}\n\n`);
+    const transactionId = ctx.request.body.transaction;
 
-    const exists = await OmieService.purchaseExists(purchaseCode);
+    console.log(`(Purchase completed)
+    Transaction ID: ${transactionId}\n\n`);
+
+    const exists = await OmieService.purchaseExists(transactionId);
 
     if (!exists) {
         ctx.status = 500;
@@ -112,10 +114,7 @@ export const purchaseCompleted = async (ctx, next) => {
             payload: null
         };    
     } else {
-        const data = ctx.request.body;
-        const purchaseCode = data.transaction;
-
-        await OmieService.confirmPurchasePayment(purchaseCode);
+        await OmieService.confirmPurchasePayment(transactionId);
 
         ctx.status = 204;
         ctx.body = {
