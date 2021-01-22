@@ -111,17 +111,17 @@ export const purchaseCompleted = async (ctx, next) => {
             message: 'Hotmart Purchase isn\'t registered',
             payload: null
         };    
+    } else {
+        const data = ctx.request.body;
+        const purchaseCode = data.transaction;
+
+        await OmieService.confirmPurchasePayment(purchaseCode);
+
+        ctx.status = 204;
+        ctx.body = {
+            status: 'success',
+            message: 'Hotmart Purchase payment confirmed',
+            payload: null
+        };
     }
-
-    const data = ctx.request.body;
-    const purchaseCode = data.transaction;
-
-    await OmieService.confirmPurchasePayment(purchaseCode);
-
-    ctx.status = 204;
-    ctx.body = {
-        status: 'success',
-        message: 'Hotmart Purchase payment confirmed',
-        payload: null
-    };
 };

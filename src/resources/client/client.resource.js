@@ -2,7 +2,6 @@ export class HotmartClient {
     constructor(type, json) {
         if (type === 'SELLER') {
             this.name = json.name;
-            this.docs = json.doc;
             this.phone = json.phone_number;
             this.phoneCode = json.phone_local_code;
             this.adress = json.adress;
@@ -13,6 +12,11 @@ export class HotmartClient {
             this.state = json.adress_state;
             this.zipCode = json.adress_zip_code;
             this.email = json.email;
+
+            if (!json.doc)
+                this.docs = "NÃO-INFORMADO";
+            else
+                this.docs = json.doc;
         } else if (type === 'AFFILIATE') {
             this.name = producer.name;
         } else {

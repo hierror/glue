@@ -130,7 +130,6 @@ export async function registerClient(client, tags) {
 
     if (client.type === 'SELLER') {
         param['email'] = client.email;
-        param['cnpj_cpf'] = client.docs;
         param['telefone1_ddd'] = client.phoneCode;
         param['telefone1_numero'] = client.phone;
         param['endereco'] = client.adress;
@@ -141,7 +140,11 @@ export async function registerClient(client, tags) {
         param['cidade'] = client.city;
         param['cep'] = client.zipCode;
     }
-     
+
+    if (!(client.docs === "NÃO-INFORMADO")) {
+        param['cnpj_cpf'] = client.docs;
+    }
+    
     try {
         data = await callOmieAPI({
             method: 'POST',
