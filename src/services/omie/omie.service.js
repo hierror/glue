@@ -66,7 +66,7 @@ export async function isClientRegistered({ docs, email, name }) {
 
     let filter;
 
-    if (docs) {
+    if (docs != "NÃO-INFORMADO") {
         filter = {'cnpj_cpf': docs};
     } else if (email) {
         filter = {'email': email};
