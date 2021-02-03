@@ -271,5 +271,10 @@ export async function purchaseExists(transactionId) {
         throw new Error('Error on purchase\'s payment consult');
     }
 
-    return data.includes("codigo_lancamento_integracao");
+
+    if (Array.isArray(data)) {
+        return data.includes("codigo_lancamento_integracao");
+    } else {
+        return false;
+    }
 };

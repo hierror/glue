@@ -11,7 +11,7 @@ const clientSchema = new mongoose.Schema({
         required: true
     },
     docs: {
-        type: Number,
+        type: String,
         required: true
     },
     email: {

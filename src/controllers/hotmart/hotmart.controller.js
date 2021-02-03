@@ -28,7 +28,7 @@ export const purchaseApproved = async (ctx, next) => {
 
     if (!info.registered) {
         console.log(`(New client)
-        Client DOCS: ${data.docs}\n\n`);
+        Client DOCS: ${client.docs}\n\n`);
 
         try {
             // Criação do registro do cliente no banco de dados
